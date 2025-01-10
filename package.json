@@ -1,28 +1,35 @@
 {
   "name": "real-time-ecommerce",
   "version": "1.0.0",
-  "description": "Real-Time E-commerce MVP Platform",
+  "description": "Real-time E-commerce Platform",
   "main": "src/server.js",
-  "type": "module",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "jest"
+    "build": "echo \"No build step needed for backend\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "ecommerce",
+    "real-time",
+    "node",
+    "express"
+  ],
+  "author": "Jeff Otieno",
+  "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2",
-    "pg": "^8.11.3",
-    "redis": "^4.6.10",
-    "socket.io": "^4.7.2",
-    "jsonwebtoken": "^9.0.2",
-    "bcrypt": "^5.1.1",
-    "dotenv": "^16.3.1",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "express-rate-limit": "^7.1.1",
-    "winston": "^3.11.0",
-    "nodemon": "^3.0.1"
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.3",
+    "socket.io": "^4.6.1"
   },
   "devDependencies": {
-    "jest": "^29.7.0"
+    "nodemon": "^2.0.22"
   }
 }

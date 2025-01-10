@@ -22,12 +22,26 @@ import orderRoutes from './routes/orders.js';
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"]
-  }
+
+// CORS configuration
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://your-frontend-domain.vercel.app'] // You'll replace this with your actual Vercel domain
+    : 'http://localhost:3000',
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+app.use(express.json());
+app.use(express.static('public'));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
 });
+app.use(limiter);
 
 // Logger configuration
 const logger = winston.createLogger({
@@ -45,17 +59,10 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.static('public'));
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+// Socket.IO setup
+const io = new Server(server, {
+  cors: corsOptions
 });
-app.use(limiter);
 
 // Make io accessible to routes
 app.set('io', io);
@@ -70,6 +77,11 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 // WebSocket connection handling
 io.on('connection', (socket) => {
   console.log('New client connected');
@@ -81,6 +93,11 @@ io.on('connection', (socket) => {
   // Real-time product updates
   socket.on('productUpdate', (data) => {
     io.emit('productUpdated', data);
+  });
+
+  // Real-time order updates
+  socket.on('orderUpdate', (data) => {
+    io.emit('orderUpdated', data);
   });
 });
 
