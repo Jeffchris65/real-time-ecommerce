@@ -17,19 +17,51 @@ export const register = createAsyncThunk(
   }
 );
 
+const initialState = {
+  isAuthenticated: false,
+  user: null,
+  loading: false,
+  error: null,
+  token: localStorage.getItem('token'),
+};
+
 const authSlice = createSlice({
   name: 'auth',
-  initialState: {
-    user: null,
-    token: localStorage.getItem('token'),
-    loading: false,
-    error: null,
-  },
+  initialState,
   reducers: {
+    setUser: (state, action) => {
+      state.isAuthenticated = true;
+      state.user = action.payload;
+      state.loading = false;
+      state.error = null;
+    },
+    setLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+    setError: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
     logout: (state) => {
+      state.isAuthenticated = false;
       state.user = null;
+      state.loading = false;
+      state.error = null;
       state.token = null;
       localStorage.removeItem('token');
+    },
+    updateUserVerification: (state, action) => {
+      if (state.user) {
+        state.user.isVerified = action.payload;
+      }
+    },
+    updateSocialConnections: (state, action) => {
+      if (state.user) {
+        state.user.socialLogins = {
+          ...state.user.socialLogins,
+          ...action.payload,
+        };
+      }
     },
   },
   extraReducers: (builder) => {
@@ -63,5 +95,13 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+export const {
+  setUser,
+  setLoading,
+  setError,
+  logout,
+  updateUserVerification,
+  updateSocialConnections,
+} = authSlice.actions;
+
 export default authSlice.reducer;
