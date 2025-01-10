@@ -3,9 +3,18 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const passport = require('passport');
 const User = require('../models/User');
-const { sendResetPasswordEmail } = require('../utils/email');
+const { sendResetPasswordEmail, sendVerificationEmail } = require('../utils/email');
 const auth = require('../middleware/auth');
+const rateLimit = require('express-rate-limit');
+
+// Rate limiting for auth routes
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 requests per window
+  message: 'Too many attempts, please try again later',
+});
 
 // Register User
 router.post('/register', async (req, res) => {
@@ -23,11 +32,16 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
+    // Create verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+
     // Create new user
     user = new User({
       name,
       email,
       password,
+      verificationToken,
+      verificationExpires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
     });
 
     // Hash password
@@ -35,6 +49,10 @@ router.post('/register', async (req, res) => {
     user.password = await bcrypt.hash(password, salt);
 
     await user.save();
+
+    // Send verification email
+    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
+    await sendVerificationEmail(user.email, verificationUrl);
 
     // Create token
     const token = jwt.sign(
@@ -49,6 +67,7 @@ router.post('/register', async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        isVerified: user.isVerified,
       },
     });
   } catch (err) {
@@ -58,7 +77,7 @@ router.post('/register', async (req, res) => {
 });
 
 // Login User
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -79,6 +98,10 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
+    // Update last login
+    user.lastLogin = Date.now();
+    await user.save();
+
     // Create token
     const token = jwt.sign(
       { id: user.id },
@@ -92,6 +115,7 @@ router.post('/login', async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        isVerified: user.isVerified,
       },
     });
   } catch (err) {
@@ -100,8 +124,92 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// Google OAuth Routes
+router.get('/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+router.get('/google/callback',
+  passport.authenticate('google', { session: false }),
+  (req, res) => {
+    const token = jwt.sign(
+      { id: req.user.id },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+    res.redirect(`${process.env.FRONTEND_URL}/social-login-success?token=${token}`);
+  }
+);
+
+// Facebook OAuth Routes
+router.get('/facebook',
+  passport.authenticate('facebook', { scope: ['email'] })
+);
+
+router.get('/facebook/callback',
+  passport.authenticate('facebook', { session: false }),
+  (req, res) => {
+    const token = jwt.sign(
+      { id: req.user.id },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+    res.redirect(`${process.env.FRONTEND_URL}/social-login-success?token=${token}`);
+  }
+);
+
+// Verify Email
+router.get('/verify-email/:token', async (req, res) => {
+  try {
+    const user = await User.findOne({
+      verificationToken: req.params.token,
+      verificationExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired verification token' });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationExpires = undefined;
+    await user.save();
+
+    res.json({ message: 'Email verified successfully' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Resend Verification Email
+router.post('/resend-verification', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (user.isVerified) {
+      return res.status(400).json({ message: 'Email already verified' });
+    }
+
+    // Generate new verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    user.verificationToken = verificationToken;
+    user.verificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+    await user.save();
+
+    // Send verification email
+    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
+    await sendVerificationEmail(user.email, verificationUrl);
+
+    res.json({ message: 'Verification email sent' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Forgot Password
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', authLimiter, async (req, res) => {
   try {
     const { email } = req.body;
 

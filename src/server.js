@@ -7,6 +7,9 @@ import winston from 'winston';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import passport from 'passport';
+import helmet from 'helmet';
+import mongoose from 'mongoose';
 
 // Initialize dotenv
 dotenv.config();
@@ -14,6 +17,14 @@ dotenv.config();
 // ES Module fix for __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('MongoDB Connected'))
+.catch(err => console.log('MongoDB Connection Error:', err));
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -35,6 +46,11 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.static('public'));
+app.use(helmet());
+app.use(passport.initialize());
+
+// Initialize Passport config
+import './config/passport';
 
 // Rate limiting
 const limiter = rateLimit({
@@ -111,6 +127,14 @@ app.use((err, req, res, next) => {
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
+
+// Serve static assets in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static('client/build'));
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  });
+}
 
 const PORT = process.env.PORT || 5000;
 
