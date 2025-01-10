@@ -1,249 +1,176 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
-import { Link } from 'react-router-dom';
-import { FaSearch, FaShoppingCart, FaMapMarkerAlt, FaBars } from 'react-icons/fa';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Box,
+  InputBase,
+  Badge,
+  IconButton,
+  Select,
+  MenuItem,
+  styled,
+  alpha,
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import SearchIcon from '@mui/icons-material/Search';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: '#fff',
+  '&:hover': {
+    backgroundColor: '#fff',
+  },
+  marginRight: theme.spacing(2),
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    width: 'auto',
+    flexGrow: 1,
+  },
+}));
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  right: 0,
+  top: 0,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#febd69',
+  borderTopRightRadius: theme.shape.borderRadius,
+  borderBottomRightRadius: theme.shape.borderRadius,
+  cursor: 'pointer',
+  '&:hover': {
+    backgroundColor: '#f3a847',
+  },
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  width: '100%',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 2),
+    paddingRight: `calc(1em + ${theme.spacing(4)})`,
+    width: '100%',
+  },
+}));
 
 const Navbar = () => {
-  const [searchFocus, setSearchFocus] = useState(false);
+  const navigate = useNavigate();
+  const [category, setCategory] = useState('all');
+  const cartItemCount = 0; // Replace with actual cart count from your state management
 
   return (
-    <NavContainer>
-      <MainNav>
-        <LogoContainer to="/">
-          <Logo>amazon</Logo>
-        </LogoContainer>
+    <AppBar position="sticky" sx={{ bgcolor: '#131921' }}>
+      <Toolbar sx={{ gap: 2 }}>
+        {/* Logo */}
+        <Typography
+          variant="h6"
+          noWrap
+          component="div"
+          sx={{ cursor: 'pointer', color: 'white', fontWeight: 'bold' }}
+          onClick={() => navigate('/')}
+        >
+          amazon
+        </Typography>
 
-        <DeliveryLocation>
-          <FaMapMarkerAlt />
-          <div>
-            <Small>Deliver to</Small>
-            <Location>Kenya</Location>
-          </div>
-        </DeliveryLocation>
+        {/* Deliver To */}
+        <Button
+          color="inherit"
+          startIcon={<LocationOnOutlinedIcon />}
+          sx={{ display: { xs: 'none', md: 'flex' }, textTransform: 'none', minWidth: 'auto' }}
+        >
+          <Box sx={{ textAlign: 'left' }}>
+            <Typography variant="caption" display="block">
+              Deliver to
+            </Typography>
+            <Typography variant="body2" sx={{ lineHeight: 1 }}>
+              Kenya
+            </Typography>
+          </Box>
+        </Button>
 
-        <SearchContainer focus={searchFocus}>
-          <SearchSelect>
-            <option>All</option>
-            <option>Electronics</option>
-            <option>Computers</option>
-            <option>Smart Home</option>
-            <option>Arts & Crafts</option>
-          </SearchSelect>
-          <SearchInput 
-            type="text" 
-            placeholder="Search Amazon"
-            onFocus={() => setSearchFocus(true)}
-            onBlur={() => setSearchFocus(false)}
-          />
-          <SearchButton>
-            <FaSearch />
-          </SearchButton>
-        </SearchContainer>
+        {/* Search Bar */}
+        <Search>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              size="small"
+              sx={{
+                bgcolor: '#f3f3f3',
+                '& .MuiSelect-select': {
+                  py: 0.5,
+                  pr: 2,
+                },
+              }}
+            >
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="electronics">Electronics</MenuItem>
+              <MenuItem value="fashion">Fashion</MenuItem>
+              <MenuItem value="books">Books</MenuItem>
+            </Select>
+            <StyledInputBase placeholder="Search Amazon" />
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+          </Box>
+        </Search>
 
-        <NavLinks>
-          <NavLink to="/account">
-            <Small>Hello, Sign in</Small>
-            <Bold>Account & Lists</Bold>
-          </NavLink>
+        {/* Account & Lists */}
+        <Button
+          color="inherit"
+          sx={{ display: { xs: 'none', md: 'block' }, textTransform: 'none' }}
+          onClick={() => navigate('/account')}
+        >
+          <Box sx={{ textAlign: 'left' }}>
+            <Typography variant="caption" display="block">
+              Hello, Sign in
+            </Typography>
+            <Typography variant="body2" sx={{ lineHeight: 1 }}>
+              Account & Lists
+            </Typography>
+          </Box>
+        </Button>
 
-          <NavLink to="/orders">
-            <Small>Returns</Small>
-            <Bold>& Orders</Bold>
-          </NavLink>
+        {/* Returns & Orders */}
+        <Button
+          color="inherit"
+          sx={{ display: { xs: 'none', md: 'block' }, textTransform: 'none' }}
+          onClick={() => navigate('/orders')}
+        >
+          <Box sx={{ textAlign: 'left' }}>
+            <Typography variant="caption" display="block">
+              Returns
+            </Typography>
+            <Typography variant="body2" sx={{ lineHeight: 1 }}>
+              & Orders
+            </Typography>
+          </Box>
+        </Button>
 
-          <CartLink to="/cart">
-            <CartIcon>
-              <FaShoppingCart />
-              <CartCount>0</CartCount>
-            </CartIcon>
-            <CartText>Cart</CartText>
-          </CartLink>
-        </NavLinks>
-      </MainNav>
-
-      <SubNav>
-        <MenuButton>
-          <FaBars />
-          All
-        </MenuButton>
-        <SubNavLinks>
-          <SubNavLink to="/deals">Today's Deals</SubNavLink>
-          <SubNavLink to="/customer-service">Customer Service</SubNavLink>
-          <SubNavLink to="/registry">Registry</SubNavLink>
-          <SubNavLink to="/gift-cards">Gift Cards</SubNavLink>
-          <SubNavLink to="/sell">Sell</SubNavLink>
-        </SubNavLinks>
-      </SubNav>
-    </NavContainer>
+        {/* Cart */}
+        <IconButton
+          color="inherit"
+          onClick={() => navigate('/cart')}
+          sx={{ display: 'flex', flexDirection: 'row', gap: 0.5 }}
+        >
+          <Badge badgeContent={cartItemCount} color="warning">
+            <ShoppingCartIcon />
+          </Badge>
+          <Typography variant="body1">Cart</Typography>
+        </IconButton>
+      </Toolbar>
+    </AppBar>
   );
 };
-
-const NavContainer = styled.nav`
-  background: ${props => props.theme.colors.primary};
-  color: white;
-`;
-
-const MainNav = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  max-width: ${props => props.theme.breakpoints.wide};
-  margin: 0 auto;
-`;
-
-const LogoContainer = styled(Link)`
-  padding: 0.5rem 1rem;
-  margin-right: 1rem;
-  &:hover {
-    outline: 1px solid white;
-  }
-`;
-
-const Logo = styled.span`
-  color: white;
-  font-size: 1.5rem;
-  font-weight: bold;
-`;
-
-const DeliveryLocation = styled.div`
-  display: flex;
-  align-items: center;
-  padding: 0.5rem;
-  cursor: pointer;
-  &:hover {
-    outline: 1px solid white;
-  }
-`;
-
-const SearchContainer = styled.div`
-  display: flex;
-  flex: 1;
-  margin: 0 1rem;
-  border-radius: 4px;
-  overflow: hidden;
-  ${props => props.focus && `
-    outline: 3px solid ${props.theme.colors.accent};
-  `}
-`;
-
-const SearchSelect = styled.select`
-  padding: 0 0.5rem;
-  background: #F3F3F3;
-  border: none;
-  border-right: 1px solid #CDCDCD;
-  cursor: pointer;
-`;
-
-const SearchInput = styled.input`
-  flex: 1;
-  padding: 0.7rem;
-  border: none;
-  font-size: 1rem;
-  &:focus {
-    outline: none;
-  }
-`;
-
-const SearchButton = styled.button`
-  width: 45px;
-  background: ${props => props.theme.colors.highlight};
-  border: none;
-  cursor: pointer;
-  &:hover {
-    background: ${props => props.theme.colors.accent};
-  }
-`;
-
-const NavLinks = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const NavLink = styled(Link)`
-  padding: 0.5rem;
-  color: white;
-  text-decoration: none;
-  &:hover {
-    outline: 1px solid white;
-  }
-`;
-
-const Small = styled.div`
-  font-size: 0.7rem;
-`;
-
-const Bold = styled.div`
-  font-size: 0.9rem;
-  font-weight: bold;
-`;
-
-const Location = styled(Bold)`
-  display: flex;
-  align-items: center;
-`;
-
-const CartLink = styled(NavLink)`
-  display: flex;
-  align-items: flex-end;
-`;
-
-const CartIcon = styled.div`
-  position: relative;
-  font-size: 1.8rem;
-`;
-
-const CartCount = styled.span`
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: ${props => props.theme.colors.accent};
-  color: ${props => props.theme.colors.text};
-  font-size: 0.9rem;
-  font-weight: bold;
-  padding: 0 4px;
-  border-radius: 50%;
-`;
-
-const CartText = styled.span`
-  font-weight: bold;
-  margin-left: 5px;
-`;
-
-const SubNav = styled.div`
-  background: ${props => props.theme.colors.secondary};
-  padding: 0.5rem 1rem;
-  display: flex;
-  align-items: center;
-`;
-
-const MenuButton = styled.button`
-  background: none;
-  border: none;
-  color: white;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  padding: 0.5rem;
-  cursor: pointer;
-  &:hover {
-    outline: 1px solid white;
-  }
-`;
-
-const SubNavLinks = styled.div`
-  display: flex;
-  margin-left: 1rem;
-`;
-
-const SubNavLink = styled(Link)`
-  color: white;
-  text-decoration: none;
-  padding: 0.5rem;
-  font-size: 0.9rem;
-  &:hover {
-    outline: 1px solid white;
-  }
-`;
 
 export default Navbar;

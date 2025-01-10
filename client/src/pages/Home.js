@@ -1,402 +1,210 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Link } from 'react-router-dom';
-import ProductCard from '../components/ProductCard';
+import {
+  Container,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  CardMedia,
+  Button,
+  Box,
+  Rating,
+  Chip,
+  Paper,
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 
 const Home = () => {
-  // Banner images for the carousel
-  const banners = [
-    {
-      id: 1,
-      image: 'https://picsum.photos/1600/600?random=1',
-      title: 'Premium Electronics',
-      link: '/category/electronics'
-    },
-    {
-      id: 2,
-      image: 'https://picsum.photos/1600/600?random=2',
-      title: 'Luxury Fashion',
-      link: '/category/fashion'
-    },
-    {
-      id: 3,
-      image: 'https://picsum.photos/1600/600?random=3',
-      title: 'Elegant Home Decor',
-      link: '/category/home'
-    }
-  ];
+  const navigate = useNavigate();
 
-  // Featured categories with premium images
-  const categories = [
-    {
-      id: 1,
-      title: 'Premium Electronics',
-      image: 'https://picsum.photos/800/600?random=4',
-      description: 'High-end gadgets and devices',
-      link: '/category/electronics'
-    },
-    {
-      id: 2,
-      title: 'Luxury Fashion',
-      image: 'https://picsum.photos/800/600?random=5',
-      description: 'Designer clothing and accessories',
-      link: '/category/fashion'
-    },
-    {
-      id: 3,
-      title: 'Home & Living',
-      image: 'https://picsum.photos/800/600?random=6',
-      description: 'Elegant home decor and furniture',
-      link: '/category/home'
-    },
-    {
-      id: 4,
-      title: 'Premium Beauty',
-      image: 'https://picsum.photos/800/600?random=7',
-      description: 'Luxury beauty and skincare',
-      link: '/category/beauty'
-    }
-  ];
-
-  // Featured products with high-quality images
-  const featuredProducts = [
-    {
-      id: 1,
-      title: 'MacBook Pro 16-inch (2023)',
-      price: 2499.99,
-      rating: 4.8,
-      reviews: 1256,
-      image: 'https://picsum.photos/400/400?random=8',
-      prime: true,
-      category: 'electronics'
-    },
-    {
-      id: 2,
-      title: 'Samsung QLED 8K Smart TV',
-      price: 3299.99,
-      rating: 4.7,
-      reviews: 892,
-      image: 'https://picsum.photos/400/400?random=9',
-      prime: true,
-      category: 'electronics'
-    },
-    {
-      id: 3,
-      title: 'Designer Leather Handbag',
-      price: 1299.99,
-      rating: 4.9,
-      reviews: 567,
-      image: 'https://picsum.photos/400/400?random=10',
-      prime: true,
-      category: 'fashion'
-    },
-    {
-      id: 4,
-      title: 'Premium Coffee Maker',
-      price: 799.99,
-      rating: 4.6,
-      reviews: 1423,
-      image: 'https://picsum.photos/400/400?random=11',
-      prime: true,
-      category: 'home'
-    }
-  ];
-
-  // Deals of the day
   const deals = [
     {
       id: 1,
-      title: 'Sony WH-1000XM4 Wireless Headphones',
-      price: 299.99,
-      originalPrice: 399.99,
-      rating: 4.8,
-      reviews: 2341,
-      image: 'https://picsum.photos/400/400?random=12',
+      title: 'Samsung 50" 4K Smart TV',
+      price: 399.99,
+      originalPrice: 599.99,
+      rating: 4.5,
+      reviews: 2345,
+      image: 'https://pisces.bbystatic.com/image2/BestBuy_US/images/products/6401/6401722_sd.jpg',
       prime: true,
-      discount: 25
     },
     {
       id: 2,
-      title: 'Apple iPad Pro 12.9-inch',
+      title: 'Sony WH-1000XM4 Headphones',
+      price: 299.99,
+      originalPrice: 349.99,
+      rating: 4.8,
+      reviews: 12543,
+      image: 'https://www.sony.com/image/5d02da5df552836db894cead8a68f5f3?fmt=png-alpha&wid=660&hei=660',
+      prime: true,
+    },
+    {
+      id: 3,
+      title: 'MacBook Air M2',
       price: 999.99,
       originalPrice: 1199.99,
       rating: 4.9,
-      reviews: 1876,
-      image: 'https://picsum.photos/400/400?random=13',
+      reviews: 8976,
+      image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/macbook-air-midnight-select-20220606?wid=452&hei=420&fmt=jpeg&qlt=95&.v=1653084303665',
       prime: true,
-      discount: 17
+    },
+    {
+      id: 4,
+      title: 'Apple Watch Series 8',
+      price: 399.99,
+      originalPrice: 429.99,
+      rating: 4.7,
+      reviews: 5632,
+      image: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MKUQ3_VW_34FR+watch-45-alum-midnight-nc-8s_VW_34FR_WF_CO?wid=750&hei=712&trim=1%2C0&fmt=p-jpg&qlt=95&.v=1632171067000%2C1661971867159',
+      prime: true,
     }
   ];
 
+  const categories = [
+    'Electronics',
+    'Home & Kitchen',
+    'Fashion',
+    'Books',
+    'Toys & Games',
+    'Sports & Outdoors',
+  ];
+
   return (
-    <Container>
-      {/* Premium Banner Carousel */}
-      <CarouselSection>
-        <img src={banners[0].image} alt={banners[0].title} />
-        <CarouselContent>
-          <h1>Welcome to Premium Shopping</h1>
-          <p>Discover luxury products and exclusive deals</p>
-          <ShopNowButton to="/products">Shop Now</ShopNowButton>
-        </CarouselContent>
-      </CarouselSection>
+    <Box sx={{ bgcolor: '#f3f3f3', minHeight: '100vh' }}>
+      {/* Categories Bar */}
+      <Paper sx={{ mb: 2 }}>
+        <Container>
+          <Box sx={{ py: 1, display: 'flex', gap: 2, overflowX: 'auto' }}>
+            {categories.map((category) => (
+              <Button
+                key={category}
+                sx={{ whiteSpace: 'nowrap' }}
+                onClick={() => navigate(`/category/${category.toLowerCase()}`)}
+              >
+                {category}
+              </Button>
+            ))}
+          </Box>
+        </Container>
+      </Paper>
 
-      {/* Premium Categories */}
-      <Section>
-        <SectionTitle>Shop Premium Categories</SectionTitle>
-        <CategoryGrid>
-          {categories.map(category => (
-            <CategoryCard key={category.id}>
-              <CategoryImage src={category.image} alt={category.title} />
-              <CategoryContent>
-                <h3>{category.title}</h3>
-                <p>{category.description}</p>
-                <CategoryLink to={category.link}>Shop now</CategoryLink>
-              </CategoryContent>
-            </CategoryCard>
-          ))}
-        </CategoryGrid>
-      </Section>
+      <Container>
+        {/* Hero Section */}
+        <Paper
+          sx={{
+            height: 300,
+            mb: 4,
+            bgcolor: '#232f3e',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+          }}
+        >
+          <Typography variant="h3" sx={{ textAlign: 'center', px: 2 }}>
+            New Year Sale<br />
+            Up to 70% Off
+          </Typography>
+        </Paper>
 
-      {/* Deals of the Day */}
-      <Section>
-        <SectionHeader>
-          <SectionTitle>Deals of the Day</SectionTitle>
-          <ViewAllLink to="/deals">View all deals</ViewAllLink>
-        </SectionHeader>
-        <ProductGrid>
-          {deals.map(product => (
-            <DealCard key={product.id}>
-              <ProductCard product={product} />
-              <DiscountBadge>{product.discount}% OFF</DiscountBadge>
-            </DealCard>
-          ))}
-        </ProductGrid>
-      </Section>
+        {/* Today's Deals Section */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
+            Today's Deals
+          </Typography>
+          <Grid container spacing={3}>
+            {deals.map((deal) => (
+              <Grid item xs={12} sm={6} md={3} key={deal.id}>
+                <Card 
+                  sx={{ 
+                    height: '100%', 
+                    position: 'relative',
+                    '&:hover': {
+                      cursor: 'pointer',
+                      boxShadow: 3,
+                      transform: 'translateY(-4px)',
+                      transition: 'all 0.3s ease-in-out',
+                    },
+                  }}
+                  onClick={() => navigate(`/product/${deal.id}`)}
+                >
+                  {deal.prime && (
+                    <Chip
+                      label="Prime"
+                      size="small"
+                      sx={{
+                        position: 'absolute',
+                        top: 10,
+                        right: 10,
+                        bgcolor: '#232f3e',
+                        color: 'white',
+                        zIndex: 1,
+                      }}
+                    />
+                  )}
+                  <CardMedia
+                    component="img"
+                    height="200"
+                    image={deal.image}
+                    alt={deal.title}
+                    sx={{ 
+                      objectFit: 'contain',
+                      bgcolor: 'white',
+                      p: 2 
+                    }}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                  <CardContent>
+                    <Typography gutterBottom variant="subtitle1" component="div" noWrap>
+                      {deal.title}
+                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                      <Rating value={deal.rating} precision={0.1} size="small" readOnly />
+                      <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                        ({deal.reviews.toLocaleString()})
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+                      <Typography variant="h6" color="error">
+                        ${deal.price}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ textDecoration: 'line-through' }}
+                      >
+                        ${deal.originalPrice}
+                      </Typography>
+                    </Box>
+                    {deal.prime && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', mt: 1 }}>
+                        <LocalShippingIcon sx={{ fontSize: 16, mr: 0.5 }} />
+                        <Typography variant="caption">Free Prime Delivery</Typography>
+                      </Box>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
 
-      {/* Featured Products */}
-      <Section>
-        <SectionTitle>Featured Products</SectionTitle>
-        <ProductGrid>
-          {featuredProducts.map(product => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </ProductGrid>
-      </Section>
-
-      {/* Prime Banner */}
-      <PrimeBanner>
-        <PrimeContent>
-          <h2>Enjoy Premium Benefits with Prime</h2>
-          <p>Fast delivery, exclusive deals, and more</p>
-          <PrimeButton to="/prime">Try Prime Free</PrimeButton>
-        </PrimeContent>
-      </PrimeBanner>
-    </Container>
+        {/* Recommended Products */}
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
+            Recommended for You
+          </Typography>
+          <Grid container spacing={3}>
+            {/* Add recommended products here similar to deals */}
+          </Grid>
+        </Box>
+      </Container>
+    </Box>
   );
 };
-
-const Container = styled.div`
-  max-width: ${({ theme }) => theme.breakpoints.wide};
-  margin: 0 auto;
-  padding: 20px;
-  background: ${({ theme }) => theme.colors.lightBackground};
-`;
-
-const CarouselSection = styled.div`
-  position: relative;
-  width: 100%;
-  height: 600px;
-  overflow: hidden;
-  margin-bottom: 40px;
-  border-radius: 8px;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
-
-const CarouselContent = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50px;
-  transform: translateY(-50%);
-  color: white;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-
-  h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-  }
-
-  p {
-    font-size: 1.5rem;
-    margin-bottom: 2rem;
-  }
-`;
-
-const ShopNowButton = styled(Link)`
-  display: inline-block;
-  padding: 15px 30px;
-  background: ${({ theme }) => theme.colors.accent};
-  color: ${({ theme }) => theme.colors.text};
-  text-decoration: none;
-  border-radius: 4px;
-  font-weight: bold;
-  transition: transform 0.2s;
-
-  &:hover {
-    transform: scale(1.05);
-  }
-`;
-
-const Section = styled.section`
-  background: white;
-  padding: 30px;
-  border-radius: 8px;
-  margin-bottom: 30px;
-  box-shadow: ${({ theme }) => theme.shadows.small};
-`;
-
-const SectionHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 1.8rem;
-  color: ${({ theme }) => theme.colors.text};
-  margin-bottom: 20px;
-`;
-
-const ViewAllLink = styled(Link)`
-  color: ${({ theme }) => theme.colors.link};
-  text-decoration: none;
-  font-weight: 500;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const CategoryGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-`;
-
-const CategoryCard = styled.div`
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: ${({ theme }) => theme.shadows.medium};
-  transition: transform 0.2s;
-
-  &:hover {
-    transform: translateY(-5px);
-  }
-`;
-
-const CategoryImage = styled.img`
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
-`;
-
-const CategoryContent = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 20px;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-  color: white;
-
-  h3 {
-    font-size: 1.4rem;
-    margin-bottom: 8px;
-  }
-
-  p {
-    font-size: 0.9rem;
-    margin-bottom: 12px;
-    opacity: 0.9;
-  }
-`;
-
-const CategoryLink = styled(Link)`
-  color: ${({ theme }) => theme.colors.accent};
-  text-decoration: none;
-  font-weight: 500;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const ProductGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-`;
-
-const DealCard = styled.div`
-  position: relative;
-`;
-
-const DiscountBadge = styled.div`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: ${({ theme }) => theme.colors.error};
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-weight: bold;
-  font-size: 0.8rem;
-`;
-
-const PrimeBanner = styled.div`
-  background: linear-gradient(135deg, ${({ theme }) => theme.colors.primary} 0%, ${({ theme }) => theme.colors.secondary} 100%);
-  border-radius: 8px;
-  padding: 40px;
-  margin-bottom: 30px;
-  text-align: center;
-  color: white;
-`;
-
-const PrimeContent = styled.div`
-  max-width: 600px;
-  margin: 0 auto;
-
-  h2 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-  }
-
-  p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-    opacity: 0.9;
-  }
-`;
-
-const PrimeButton = styled(Link)`
-  display: inline-block;
-  padding: 15px 30px;
-  background: ${({ theme }) => theme.colors.accent};
-  color: ${({ theme }) => theme.colors.text};
-  text-decoration: none;
-  border-radius: 4px;
-  font-weight: bold;
-  transition: transform 0.2s;
-
-  &:hover {
-    transform: scale(1.05);
-  }
-`;
 
 export default Home;

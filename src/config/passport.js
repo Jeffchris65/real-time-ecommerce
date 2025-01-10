@@ -1,9 +1,8 @@
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const FacebookStrategy = require('passport-facebook').Strategy;
-const JwtStrategy = require('passport-jwt').Strategy;
-const ExtractJwt = require('passport-jwt').ExtractJwt;
-const User = require('../models/User');
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import { Strategy as FacebookStrategy } from 'passport-facebook';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+import User from '../models/User.js';
 
 // JWT Strategy
 const jwtOptions = {
@@ -26,131 +25,101 @@ passport.use(
 );
 
 // Google Strategy
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: '/api/auth/google/callback',
-      proxy: true,
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        // Check if user exists
-        let user = await User.findOne({ 'socialLogins.google.id': profile.id });
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: '/api/auth/google/callback',
+        proxy: true,
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          let user = await User.findOne({ 'socialLogins.google.id': profile.id });
 
-        if (user) {
-          // Update user information
-          user.socialLogins.google = {
-            id: profile.id,
-            email: profile.emails[0].value,
-            name: profile.displayName,
-          };
-          await user.save();
-          return done(null, user);
-        }
-
-        // Check if user exists with same email
-        user = await User.findOne({ email: profile.emails[0].value });
-
-        if (user) {
-          // Link Google account to existing user
-          user.socialLogins.google = {
-            id: profile.id,
-            email: profile.emails[0].value,
-            name: profile.displayName,
-          };
-          await user.save();
-          return done(null, user);
-        }
-
-        // Create new user
-        user = new User({
-          name: profile.displayName,
-          email: profile.emails[0].value,
-          password: Math.random().toString(36).slice(-8), // Generate random password
-          isVerified: true,
-          socialLogins: {
-            google: {
+          if (user) {
+            user.socialLogins.google = {
               id: profile.id,
               email: profile.emails[0].value,
               name: profile.displayName,
-            },
-          },
-        });
+            };
+            await user.save();
+            return done(null, user);
+          }
 
-        await user.save();
-        return done(null, user);
-      } catch (error) {
-        return done(error, false);
+          // Create new user
+          user = new User({
+            email: profile.emails[0].value,
+            name: profile.displayName,
+            socialLogins: {
+              google: {
+                id: profile.id,
+                email: profile.emails[0].value,
+                name: profile.displayName,
+              },
+            },
+            isEmailVerified: true, // Google emails are verified
+          });
+
+          await user.save();
+          return done(null, user);
+        } catch (error) {
+          return done(error, false);
+        }
       }
-    }
-  )
-);
+    )
+  );
+}
 
 // Facebook Strategy
-passport.use(
-  new FacebookStrategy(
-    {
-      clientID: process.env.FACEBOOK_APP_ID,
-      clientSecret: process.env.FACEBOOK_APP_SECRET,
-      callbackURL: '/api/auth/facebook/callback',
-      profileFields: ['id', 'emails', 'name'],
-      proxy: true,
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        // Check if user exists
-        let user = await User.findOne({ 'socialLogins.facebook.id': profile.id });
+if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
+  passport.use(
+    new FacebookStrategy(
+      {
+        clientID: process.env.FACEBOOK_APP_ID,
+        clientSecret: process.env.FACEBOOK_APP_SECRET,
+        callbackURL: '/api/auth/facebook/callback',
+        profileFields: ['id', 'emails', 'name'],
+        proxy: true,
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          let user = await User.findOne({ 'socialLogins.facebook.id': profile.id });
 
-        if (user) {
-          // Update user information
-          user.socialLogins.facebook = {
-            id: profile.id,
-            email: profile.emails[0].value,
-            name: `${profile.name.givenName} ${profile.name.familyName}`,
-          };
-          await user.save();
-          return done(null, user);
-        }
-
-        // Check if user exists with same email
-        user = await User.findOne({ email: profile.emails[0].value });
-
-        if (user) {
-          // Link Facebook account to existing user
-          user.socialLogins.facebook = {
-            id: profile.id,
-            email: profile.emails[0].value,
-            name: `${profile.name.givenName} ${profile.name.familyName}`,
-          };
-          await user.save();
-          return done(null, user);
-        }
-
-        // Create new user
-        user = new User({
-          name: `${profile.name.givenName} ${profile.name.familyName}`,
-          email: profile.emails[0].value,
-          password: Math.random().toString(36).slice(-8), // Generate random password
-          isVerified: true,
-          socialLogins: {
-            facebook: {
+          if (user) {
+            user.socialLogins.facebook = {
               id: profile.id,
               email: profile.emails[0].value,
               name: `${profile.name.givenName} ${profile.name.familyName}`,
-            },
-          },
-        });
+            };
+            await user.save();
+            return done(null, user);
+          }
 
-        await user.save();
-        return done(null, user);
-      } catch (error) {
-        return done(error, false);
+          // Create new user
+          user = new User({
+            email: profile.emails[0].value,
+            name: `${profile.name.givenName} ${profile.name.familyName}`,
+            socialLogins: {
+              facebook: {
+                id: profile.id,
+                email: profile.emails[0].value,
+                name: `${profile.name.givenName} ${profile.name.familyName}`,
+              },
+            },
+            isEmailVerified: true, // Facebook emails are verified
+          });
+
+          await user.save();
+          return done(null, user);
+        } catch (error) {
+          return done(error, false);
+        }
       }
-    }
-  )
-);
+    )
+  );
+}
 
 passport.serializeUser((user, done) => {
   done(null, user.id);
@@ -165,4 +134,4 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-module.exports = passport;
+export default passport;
